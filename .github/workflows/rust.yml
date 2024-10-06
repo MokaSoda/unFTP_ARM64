@@ -13,6 +13,7 @@ name: build
 env:
   CARGO_TERM_COLOR: always
   RUST_VERSION: 1.78.0
+  BUILD_CMD: cargo
 
 on:
   push:
@@ -98,7 +99,7 @@ jobs:
       - name: Install Rust Toolchain Components  
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: ${{ target }}
         
       - name: Install cross
         uses: taiki-e/install-action@v2
@@ -119,7 +120,7 @@ jobs:
         run: rustup target add aarch64-unknown-linux-musl
     
       - name: Build for Linux (MUSL)
-        run: RUSTFLAGS="-C target-feature=+crt-static" cargo build --no-default-features --features docker --release --target=${{ env.target }}
+        run: RUSTFLAGS="-C target-feature=+crt-static"  $BUILD_CMD build --no-default-features --features docker --release --target=${{ env.target }}
       - name: Rename
         run: mv target/${{ env.target }}/release/unftp target/${{ env.target }}/release/unftp_${{ env.target }}
       - name: Upload build artifacts
