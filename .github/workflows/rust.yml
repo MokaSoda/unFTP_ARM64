@@ -114,15 +114,7 @@ jobs:
         with:
         
           fetch-depth: 0  # Otherwise the code that retrieves the git version doesn't work
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ env.RUST_VERSION }}
-          override: true
-          default: true
-          target: ${{ env.target }}
-      - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
       - name: Build for Linux (MUSL)
         run: RUSTFLAGS="-C target-feature=+crt-static" cargo build --no-default-features --features docker --release --target=${{ env.target }}
       - name: Rename
