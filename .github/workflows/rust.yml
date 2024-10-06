@@ -27,21 +27,21 @@ on:
 
 jobs:
 
-  get_version:
-    name: Get unFTP version
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_latest_tag.outputs.version }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Otherwise we get a 'fatal: No names found, cannot describe anything.' error.
-      - name: Get latest tag
-        id: get_latest_tag
-        run: |
-          tag=$(git describe --tags)
-          echo "version=$tag" >> $GITHUB_OUTPUT
+  # get_version:
+  #   name: Get unFTP version
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     version: ${{ steps.get_latest_tag.outputs.version }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0  # Otherwise we get a 'fatal: No names found, cannot describe anything.' error.
+  #     - name: Get latest tag
+  #       id: get_latest_tag
+  #       run: |
+  #         tag=$(git describe --tags)
+  #         echo "version=$tag" >> $GITHUB_OUTPUT
 
   format:
     name: Check Formatting
@@ -87,7 +87,7 @@ jobs:
   build-linux-musl:
     runs-on: ubuntu-latest
     name: Build for Linux (MUSL)
-    needs: get_version
+    # needs: get_version
     env:
       target: arm64-unknown-linux-musl
       BUILD_VERSION: ${{ needs.get_version.outputs.version }}
