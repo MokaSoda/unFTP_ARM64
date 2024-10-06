@@ -89,7 +89,7 @@ jobs:
     name: Build for Linux (MUSL)
     # needs: get_version
     env:
-      target: arm64-unknown-linux-musl
+      target: aarch64-unknown-linux-musl
       BUILD_VERSION: ${{ needs.get_version.outputs.version }}
     steps:
       - name: Checkout code
