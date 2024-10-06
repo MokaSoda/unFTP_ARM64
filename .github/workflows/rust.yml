@@ -99,7 +99,7 @@ jobs:
       - name: Install Rust Toolchain Components  
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ target }}
+          targets: aarch64-unknown-linux-musl
         
       - name: Install cross
         uses: taiki-e/install-action@v2
