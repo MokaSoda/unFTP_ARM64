@@ -89,12 +89,12 @@ jobs:
    
    
    
-  build-linux-musl:
+  build-linux-gnu:
     runs-on: ubuntu-latest
-    name: Build for Linux (MUSL)
+    name: Build for Linux (GNU)
     # needs: get_version
     env:
-      target: aarch64-linux-android
+      target: aarch64-unknown-linux-gnu
       BUILD_VERSION: ${{ needs.get_version.outputs.version }}
     steps:
       - name: Install Rust Toolchain Components  
@@ -131,17 +131,61 @@ jobs:
           path: target/${{ env.target }}/release/unftp_${{ env.target }}
 
 
+  build-linux-musl:
+    runs-on: ubuntu-latest
+    name: Build for Linux (musl)
+    # needs: get_version
+    env:
+      target: aarch64-unknown-linux-musl
+      BUILD_VERSION: ${{ needs.get_version.outputs.version }}
+    steps:
+      - name: Install Rust Toolchain Components  
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ env.target }}
+        
+      - name: Install cross
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cross
+        
+      - name: Overwrite build command env variable
+        shell: bash
+        run: echo "BUILD_CMD=cross" >> $GITHUB_ENV
+    
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+        
+          fetch-depth: 0  # Otherwise the code that retrieves the git version doesn't work
+      - name: add compiler to rust
+        shell: bash
+        run: rustup target add ${{ env.target }}
+    
+      - name: Build for Linux (MUSL)
+        run: RUSTFLAGS="-C target-feature=+crt-static"  $BUILD_CMD build --no-default-features --features docker --release --target=${{ env.target }}
+      - name: Rename
+        run: mv target/${{ env.target }}/release/unftp target/${{ env.target }}/release/unftp_${{ env.target }}
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: unftp_${{ env.target }}
+          path: target/${{ env.target }}/release/unftp_${{ env.target }}
+
+      
   upload-release-binaries:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         build:
-          - x86_64-unknown-linux-musl
+          - aarch64-unknown-linux-gnu
+          - aarch64-unknown-linux-musl
 
     env:
       file_name: unftp_${{ matrix.build }}${{ contains(matrix.build, 'windows') && '.exe' || '' }}
       file_dir: ./${{ matrix.build }}
     needs:
+      - build-linux-gnu
       - build-linux-musl
 
     name: Upload Release Artifacts
