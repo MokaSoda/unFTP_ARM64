@@ -83,7 +83,10 @@ jobs:
         with:
           command: clippy
           args: --all-features --workspace -- -D warnings
-
+      
+   
+   
+   
   build-linux-musl:
     runs-on: ubuntu-latest
     name: Build for Linux (MUSL)
@@ -92,9 +95,24 @@ jobs:
       target: aarch64-unknown-linux-musl
       BUILD_VERSION: ${{ needs.get_version.outputs.version }}
     steps:
+      - name: Install Rust Toolchain Components  
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+        
+      - name: Install cross
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cross
+        
+      - name: Overwrite build command env variable
+        shell: bash
+        run: echo "BUILD_CMD=cross" >> $GITHUB_ENV
+      
       - name: Checkout code
         uses: actions/checkout@v3
         with:
+        
           fetch-depth: 0  # Otherwise the code that retrieves the git version doesn't work
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
