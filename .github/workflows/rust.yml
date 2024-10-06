@@ -108,13 +108,16 @@ jobs:
       - name: Overwrite build command env variable
         shell: bash
         run: echo "BUILD_CMD=cross" >> $GITHUB_ENV
-      
+    
       - name: Checkout code
         uses: actions/checkout@v3
         with:
         
           fetch-depth: 0  # Otherwise the code that retrieves the git version doesn't work
-
+      - name: add compiler to rust
+        shell: bash
+        run: rustup target add aarch64-unknown-linux-musl
+    
       - name: Build for Linux (MUSL)
         run: RUSTFLAGS="-C target-feature=+crt-static" cargo build --no-default-features --features docker --release --target=${{ env.target }}
       - name: Rename
